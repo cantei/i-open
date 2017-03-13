@@ -1,0 +1,80 @@
+
+/* ---------------------------------------------   DepDrop ----------------------------------------  */
+
+public function actionGetDistrict() {
+        $out = [];
+        if (isset($_POST['depdrop_parents'])) {
+            $parents = $_POST['depdrop_parents'];
+            if ($parents != null) {
+                $province_id = $parents[0];
+                $out = $this->getDistrict($province_id);
+                echo Json::encode(['output' => $out, 'selected' => '']);
+                return;
+            }
+        }
+        echo Json::encode(['output' => '', 'selected' => '']);
+    }
+     protected function getDistrict($id) {
+        $datas = District::find()->where(['PROVINCE_ID' => $id])->all();
+        return $this->MapData($datas, 'AMPHUR_ID', 'AMPHUR_NAME');
+    }
+    
+    
+    public function actionGetSubdistrict() {
+         $out = [];
+         if (isset($_POST['depdrop_parents'])) {
+             $ids = $_POST['depdrop_parents'];
+             $province_id = empty($ids[0]) ? null : $ids[0];
+             $district_id = empty($ids[1]) ? null : $ids[1];
+             
+             
+//             echo $province_id.'---'.$district_id;die;
+             if ($district_id != null) {
+                $data = $this->getSubdistrict($district_id);
+                echo Json::encode(['output'=>$data, 'selected'=>'']);
+                return;
+             }
+         }
+         echo Json::encode(['output'=>'', 'selected'=>'']);
+     }
+
+    protected function getSubdistrict($id){
+        $datas = \app\models\Subdistrict::find()->where(['AMPHUR_ID'=>$id])->all();
+        return $this->MapData($datas,'DISTRICT_ID','DISTRICT_NAME');
+    }
+
+    
+    
+        public function actionGetVilla() {
+         $out = [];
+         if (isset($_POST['depdrop_parents'])) {
+            $ids = $_POST['depdrop_parents'];
+            $province_id = empty($ids[0]) ? null : $ids[0];
+            $district_id = empty($ids[1]) ? null : $ids[1];
+            $subistrict_id = empty($ids[2]) ? null : $ids[2];
+             
+             
+//             echo $province_id.'---'.$district_id;die;
+             if ($subistrict_id != null) {
+                $data = $this->getVilla($subistrict_id);
+                echo Json::encode(['output'=>$data, 'selected'=>'']);
+                return;
+             }
+         }
+         echo Json::encode(['output'=>'', 'selected'=>'']);
+     }
+
+    protected function getVilla($id){
+        $datas = \app\models\Villa::find()->where(['SUBDIST_ID'=>$id])->all();
+        return $this->MapData($datas,'VILLAGE_ID','VILLAGE_NAME');
+    }
+    
+    
+    protected function MapData($datas, $fieldId, $fieldName) {
+        $obj = [];
+        foreach ($datas as $key => $value) {
+            array_push($obj, ['id' => $value->{$fieldId}, 'name' => $value->{$fieldName}]);
+        }
+        return $obj;
+    }
+/* ---------------------------------------------  end DepDrop ----------------------------------------  */
